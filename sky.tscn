@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://cwybumwb6tgwq"]
+
+[ext_resource type="Script" path="res://sky.tres.gd" id="2_vi1se"]
+
+[sub_resource type="GDScript" id="GDScript_fqttg"]
+script/source = "extends Node2D
+
+@export var number_of_boids := 25
+const BOID = preload(\"res://boid.tscn\")
+@onready var region = $Sky/CollisionShape2D
+
+func _ready():
+	for i in number_of_boids:
+		var entity = BOID.instantiate()
+		
+		entity.global_position.x = randf_range(0, region.shape.size.x)
+		entity.global_position.y = randf_range(0, region.shape.size.y)
+		entity.rotation = randf_range(0, 2*PI)
+		
+		add_child(entity)
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_k8cdt"]
+size = Vector2(1154.75, 645.75)
+
+[node name="Sim" type="Node2D"]
+script = SubResource("GDScript_fqttg")
+number_of_boids = 80
+
+[node name="Sky" type="Area2D" parent="."]
+position = Vector2(285, 123)
+collision_layer = 2
+script = ExtResource("2_vi1se")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sky"]
+visible = false
+position = Vector2(292.625, 201.125)
+shape = SubResource("RectangleShape2D_k8cdt")
+
+[connection signal="body_entered" from="Sky" to="Sky" method="_on_body_entered"]
+[connection signal="body_exited" from="Sky" to="Sky" method="_on_body_exited"]
